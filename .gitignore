@@ -1,0 +1,11 @@
+# Ignore local environment variables containing your secret API keys
+.env
+
+# Ignore python cache files
+__pycache__/
+*.pyc
+
+# Ignore virtual environments
+.conda/
+env/
+venv/
