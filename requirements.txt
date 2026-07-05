@@ -1,0 +1,21 @@
+# Core
+langgraph
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+
+# LLM provider
+langchain-openai          # OpenAI  (set OPENAI_API_KEY)
+
+# Notebook + visualization
+jupyter
+ipykernel
+
+# Optional: persistence to disk (Module 9) and deployment (Module 16)
+langgraph-checkpoint-sqlite
+fastapi
+uvicorn
+
+# Optional: observability (Module 15) -> also set LANGCHAIN_TRACING_V2 / LANGCHAIN_API_KEY
+langsmith
