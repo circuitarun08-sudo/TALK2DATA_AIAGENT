@@ -50,7 +50,7 @@ def query_llm_farm(prompt: str):
         response.raise_for_status()
         return response.json()['choices'][0]['message']['content']
     except Exception as e:
-        # If the API still complains about the 'api-key' header, we can print the response body to see the exact error message
+        # If the API  complains about the 'api-key' header, we can print the response body to see the exact error message
         if hasattr(e, 'response') and e.response is not None:
             return f"Error contacting Bosch LLM Farm: {e}\nDetails: {e.response.text}"
         return f"Error contacting Bosch LLM Farm: {e}"
