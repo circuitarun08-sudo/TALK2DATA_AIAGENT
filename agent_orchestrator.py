@@ -1,6 +1,10 @@
 import os
+import sys
 import requests
 from dotenv import load_dotenv
+from agent_writer import write_content
+from agent_reviewer import query_llm_farm
+
 
 # Load variables from .env file
 load_dotenv()
@@ -9,21 +13,20 @@ load_dotenv()
 api_key = os.getenv("LLM_FARM_API_KEY")
 
 if not api_key:
-        raise ValueError("LLM_FARM_API_KEY not found. Please set it in your .env file.")
-else:
-        print("LLM_FARM_API_KEY found. Proceeding with API call.")
+    print("Error: LLM_FARM_API_KEY is not set in the environment.")
+    sys.exit(1)
 
-def write_content(userPrompt: str, feedback: str = None):
+def query_llm_farm(userPrompt: str):
     # Base configuration for Bosch LLM Farm API
-    url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
+    url = "https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
     
-    #headers for openai LLM Farm API
+    # Headers for openai LLM Farm API
     headers = {
         "api-key": api_key,
         "Content-Type": "application/json"
     }
 
-    #Payload for the API request
+    # Payload for the API request
     payload = {
         "messages": [
             {"role": "system", "content": "You are a professional content writer. Write clear, engaging content based on the user's prompt. If provided with previous feedback, revise your work to address those points specifically."},
@@ -31,9 +34,6 @@ def write_content(userPrompt: str, feedback: str = None):
         ],
         "temperature": 1
     }
-
-    if feedback:
-        payload["messages"].append({"role": "user", "content": f"Previous feedback: {feedback}"})
 
     try:
         response = requests.post(url, headers=headers, json=payload)
@@ -44,15 +44,3 @@ def write_content(userPrompt: str, feedback: str = None):
         if hasattr(e, 'response') and e.response is not None:
             return f"Error contacting Bosch LLM Farm: {e}\nDetails: {e.response.text}"
         return f"Error contacting Bosch LLM Farm: {e}"
-    
-if __name__ == "__main__":
-    # Get input from the user for the topic they want to create content about
-    userPrompt=input("What topic would you like me to create content about?")
-    print(f"Sending prompt to Bosch LLM Farm for topic: {userPrompt}...")
-    feedback=input("If you have any feedback from a previous review, please provide it here (or press Enter to skip): ")
-
-    #Send request to Bosch LLM Farm and get the response
-    response_text = write_content(userPrompt)
-    print("Response from Bosch LLM Farm:")
-    print(response_text)
-    
