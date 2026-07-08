@@ -34,6 +34,8 @@ def write_content(userPrompt: str, feedback: str = None):
 
     if feedback:
         payload["messages"].append({"role": "user", "content": f"Previous feedback: {feedback}"})
+    
+    print("Request to Bosch LLM Farm:")
 
     try:
         response = requests.post(url, headers=headers, json=payload)
@@ -52,7 +54,7 @@ if __name__ == "__main__":
     feedback=input("If you have any feedback from a previous review, please provide it here (or press Enter to skip): ")
 
     #Send request to Bosch LLM Farm and get the response
-    response_text = write_content(userPrompt)
+    response_text = write_content(userPrompt, feedback)
     print("Response from Bosch LLM Farm:")
     print(response_text)
     
