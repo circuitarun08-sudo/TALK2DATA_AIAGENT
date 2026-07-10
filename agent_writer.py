@@ -15,8 +15,9 @@ else:
 
 def write_content(userPrompt: str, feedback: str = None):
     # Base configuration for Bosch LLM Farm API
-    url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
     
+    url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
+    print(requests.utils.get_environ_proxies(url))
     #headers for openai LLM Farm API
     headers = {
         "api-key": api_key,
