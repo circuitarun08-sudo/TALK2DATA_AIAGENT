@@ -13,7 +13,7 @@ if not api_key:
 else:
         print("LLM_FARM_API_KEY found. Proceeding with API call.")
 
-def review_content(response_content: str):
+def review_content(response_content: str, prompt: str):
     # Base configuration for Bosch LLM Farm API
     url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
     print(requests.utils.get_environ_proxies(url))
@@ -27,7 +27,8 @@ def review_content(response_content: str):
     payload = {
         "messages": [
             {"role": "system", "content": "You are a critical quality controller. Review the provided text for accuracy, clarity, and depth. You must respond ONLY in a valid JSON format: {\"score\": <1 to 5>, \"feedback\": \"<detailed critique>\"}."},
-            {"role": "user", "content": response_content}
+            {"role": "user", "content": response_content},
+            {"role": "user", "content": f"Prompt: {prompt}"}
         ],
         "temperature": 1
     }
@@ -49,10 +50,11 @@ def review_content(response_content: str):
 if __name__ == "__main__":
     # Get input from the user for the content they want to review
     response_content=input("Please provide the content you would like to have reviewed:")
+    prompt=input("Please provide the original prompt that was used to generate this content:")
     print(f"Sending content to Bosch LLM Farm for review...")
     
     #Send request to Bosch LLM Farm and get the response
-    review_response_score, review_response_feedback = review_content(response_content)
+    review_response_score, review_response_feedback = review_content(response_content,prompt)
     print("Review response from Bosch LLM Farm:")
     print('Score:', review_response_score)
     print('Feedback:', review_response_feedback)

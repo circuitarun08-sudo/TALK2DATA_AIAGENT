@@ -1,9 +1,10 @@
 import os
 import sys
 import requests
+import json
 from dotenv import load_dotenv
 from agent_writer import write_content
-from agent_reviewer import query_llm_farm
+from agent_reviewer import review_content
 
 
 # Load variables from .env file
@@ -16,31 +17,37 @@ if not api_key:
     print("Error: LLM_FARM_API_KEY is not set in the environment.")
     sys.exit(1)
 
-def query_llm_farm(userPrompt: str):
-    # Base configuration for Bosch LLM Farm API
-    url = "https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
+def orchestrate_content_creation(user_prompt: str, feedback: str = None):
+    max_iterations = 3
+    current_iteration = 1
+
+    # Step 1: Generate content based on the user's prompt and optional feedback
+    print(f"Generating content for prompt: {user_prompt}...")
+    generated_content = write_content(user_prompt, feedback)
     
-    # Headers for openai LLM Farm API
-    headers = {
-        "api-key": api_key,
-        "Content-Type": "application/json"
-    }
+    if "Error contacting Bosch LLM Farm" in generated_content:
+        print(generated_content)
+        return
 
-    # Payload for the API request
-    payload = {
-        "messages": [
-            {"role": "system", "content": "You are a professional content writer. Write clear, engaging content based on the user's prompt. If provided with previous feedback, revise your work to address those points specifically."},
-            {"role": "user", "content": userPrompt}
-        ],
-        "temperature": 1
-    }
+    print("Generated Content:")
+    print(generated_content)
 
-    try:
-        response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()
-        return response.json()['choices'][0]['message']['content']
-    except Exception as e:
-        # If the API still fails with the 'api-key' header, print the response body to see the exact error message
-        if hasattr(e, 'response') and e.response is not None:
-            return f"Error contacting Bosch LLM Farm: {e}\nDetails: {e.response.text}"
-        return f"Error contacting Bosch LLM Farm: {e}"
+    # Step 2: Review the generated content
+    print("Reviewing the generated content...")
+    review_score, review_feedback = review_content(generated_content, user_prompt)
+
+    if review_score is None:
+        print(review_feedback)  # This will contain the error message
+        return
+
+    print("Review Results:")
+    print(f"Score: {review_score}")
+    print(f"Feedback: {review_feedback}")
+
+if __name__ == "__main__":
+    # Get input from the user for the topic they want to create content about
+    user_prompt = input("What topic would you like me to create content about? ")
+    #feedback = input("If you have any feedback from a previous review, please provide it here (or press Enter to skip): ")
+
+    # Orchestrate the content creation and review process
+    orchestrate_content_creation(user_prompt)
