@@ -18,8 +18,10 @@ if not api_key:
     sys.exit(1)
 
 def orchestrate_content_creation(user_prompt: str, feedback: str = None):
+    # Initialize the variables for the iterative process
     max_iterations = 3
     current_iteration = 1
+    feedback_history = []  # To keep track of feedback from each iteration
 
     while(current_iteration <= max_iterations):
 
@@ -56,6 +58,12 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None):
         else:
             print("Content quality is unsatisfactory. Continuing to the next iteration.")
             feedback = review_feedback  # Use the feedback for the next iteration
+            feedback_history.append({
+                "iteration": current_iteration,
+                "feedback": review_feedback
+            })  # Keep track of feedback from each iteration
+            print(f"Feedback for Iteration {current_iteration} stored for next iteration.")
+            print(f"Feedback History after Iteration {current_iteration}: {feedback_history}")
 
         current_iteration += 1
 
