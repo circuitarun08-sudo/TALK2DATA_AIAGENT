@@ -14,7 +14,7 @@ if not api_key:
 else:
         print("LLM_FARM_API_KEY found. Proceeding with API call.")
 """
-def write_content(userPrompt: str, feedback: str = None, api_key: str = None):
+def write_content(userPrompt: str, current_draft: str = None, feedback: list = None, api_key: str = None):
     # Base configuration for Bosch LLM Farm API
     if not api_key:
         raise ValueError("LLM_FARM_API_KEY not found. Please set it in your .env file.")
@@ -22,7 +22,7 @@ def write_content(userPrompt: str, feedback: str = None, api_key: str = None):
         print("LLM_FARM_API_KEY found. Proceeding with API call.")
 
     url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
-    print(requests.utils.get_environ_proxies(url))
+    #print(requests.utils.get_environ_proxies(url))
     #headers for openai LLM Farm API
     headers = {
         "api-key": api_key,
@@ -39,9 +39,27 @@ def write_content(userPrompt: str, feedback: str = None, api_key: str = None):
     }
 
     if feedback:
-        payload["messages"].append({"role": "user", "content": f"Previous feedback: {feedback}"})
+        feedback_history="\nHere are the instructions to be followed:\n"
+        for entry in feedback:
+            feedback_history += f"- Iteration {entry['iteration']} : {entry['feedback']}\n"
+        payload["messages"].append({"role": "user", "content": f"Consider following instructions while generating content:\n{feedback_history}"})
+
+    if feedback and current_draft:
+            feedback_history="\nHere is the previous feedback to be addressed:\n"
+            for entry in feedback:
+                feedback_history += f"- Iteration {entry['iteration']} : {entry['feedback']}\n"
+            #payload["messages"].append({"role": "user", "content": f"Current draft: {current_draft}\n{feedback_history}"})
+            payload["messages"].append({"role": "user", "content": (
+            f"\n\nYour previous draft was:\n---START DRAFT---\n{current_draft}\n---END DRAFT---\n"
+            f"{feedback_history}\n"
+            f"Please revise the draft to fully address all the feedback points listed above."
+            )})
     
-    print("Request to Bosch LLM Farm:")
+    print("Request to Bosch LLM Farm..")
+
+    #for debugging purposes, print the payload being sent to Bosch LLM Farm
+    #print("Payload being sent to Bosch LLM Farm:")
+    #print(payload)
 
     try:
         response = requests.post(url, headers=headers, json=payload)
@@ -56,11 +74,13 @@ def write_content(userPrompt: str, feedback: str = None, api_key: str = None):
 if __name__ == "__main__":
     # Get input from the user for the topic they want to create content about
     userPrompt=input("What topic would you like me to create content about?")
-    print(f"Sending prompt to Bosch LLM Farm for topic: {userPrompt}...")
-    feedback=input("If you have any feedback from a previous review, please provide it here (or press Enter to skip): ")
+    print(f"Before sending prompt to Bosch LLM Farm for topic... {userPrompt}...")
+    feedback=input("If you have any instructions to be followed, please provide it here (or press Enter to skip): ")
+
+    print("Waiting for response from Bosch LLM Farm...")
 
     #Send request to Bosch LLM Farm and get the response
-    response_text = write_content(userPrompt, feedback, api_key)
+    response_text = write_content(userPrompt, current_draft=None, feedback=[{"iteration": 1, "feedback": feedback}] if feedback else None, api_key=api_key)
     print("Response from Bosch LLM Farm:")
     print(response_text)
     

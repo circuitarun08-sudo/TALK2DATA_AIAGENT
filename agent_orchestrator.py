@@ -21,13 +21,14 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None):
     # Initialize the variables for the iterative process
     max_iterations = 3
     current_iteration = 1
+    current_draft=""
     feedback_history = []  # To keep track of feedback from each iteration
 
     while(current_iteration <= max_iterations):
 
         # Step 1: Generate content based on the user's prompt and optional feedback
         print(f"Generating content for prompt: {user_prompt}...")
-        generated_content = write_content(user_prompt, feedback, api_key)
+        generated_content = write_content(user_prompt, current_draft, feedback_history, api_key)
 
         print("Content generation in-progress...")
         print(f"Iteration {current_iteration} completed.")
@@ -37,11 +38,13 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None):
             return
 
         print(f"Generated Content after Iteration {current_iteration}:")
+        current_draft=generated_content
         print(generated_content)
-
+ 
         # Step 2: Review the generated content
         print("Reviewing the generated content...")
-        raw_json_response_content, review_score, review_feedback = review_content(generated_content, user_prompt, api_key)
+        #raw_json_response_content, review_score, review_feedback = review_content(generated_content, user_prompt, api_key)
+        review_score, review_feedback = review_content(generated_content, user_prompt, api_key)
 
         if review_score is None:
             print(review_feedback)  # This will contain the error message
@@ -57,7 +60,7 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None):
             break
         else:
             print("Content quality is unsatisfactory. Continuing to the next iteration.")
-            feedback = review_feedback  # Use the feedback for the next iteration
+            #feedback = review_feedback  # Use the feedback for the next iteration
             feedback_history.append({
                 "iteration": current_iteration,
                 "feedback": review_feedback
@@ -66,6 +69,8 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None):
             print(f"Feedback History after Iteration {current_iteration}: {feedback_history}")
 
         current_iteration += 1
+
+    print(f"Number of Iterations taken to arrive at conclusion :{current_iteration-1}")
 
 if __name__ == "__main__":
     # Get input from the user for the topic they want to create content about
