@@ -37,31 +37,28 @@ The architecture implements a closed-loop feedback system where:
 
 ```mermaid
 sequenceDiagram
-    participant User as 👤 User
-    participant Orchestrator as 🎯 Orchestrator<br/>(State Manager)
-    participant Writer as ✍️ Writer Agent<br/>(Generator)
-    participant Reviewer as 👁️ Reviewer Agent<br/>(Evaluator)
+    participant User
+    participant Orchestrator
+    participant Writer
+    participant Reviewer
 
-    User->>Orchestrator: Submit Topic + Context
-    
-    loop Iteration Loop (Max 3)
-        Orchestrator->>Writer: Generate/Revise Content<br/>(with feedback history)
-        Writer->>Orchestrator: Return Draft
-        
-        Orchestrator->>Reviewer: Evaluate Draft
-        Reviewer->>Orchestrator: Return {score, feedback}
-        
-        Orchestrator->>Orchestrator: Update Trajectory<br/>(score + feedback)
-        
-        alt Score ≥ 3
-            Orchestrator->>User: ✅ Deliver Final Content
-            break Exit Loop
-        else Score < 3
-            Orchestrator->>Orchestrator: Record Feedback<br/>Increment Iteration
+    User->>Orchestrator: Submit topic and context
+
+    loop Up to 3 iterations
+        Orchestrator->>Writer: Generate or revise draft with feedback history
+        Writer-->>Orchestrator: Return draft
+
+        Orchestrator->>Reviewer: Evaluate draft
+        Reviewer-->>Orchestrator: Return score and feedback
+
+        alt score >= 3
+            Orchestrator-->>User: Deliver final content
+        else score < 3
+            Orchestrator->>Orchestrator: Store feedback and increment iteration
         end
     end
-    
-    Orchestrator->>User: 📄 Final Output + History
+
+    Orchestrator-->>User: Return final output and trajectory history
 ```
 
 ### Data Flow Overview
