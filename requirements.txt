@@ -19,3 +19,9 @@ uvicorn
 
 # Optional: observability (Module 15) -> also set LANGCHAIN_TRACING_V2 / LANGCHAIN_API_KEY
 langsmith
+
+# Optional: vector database (Module 10)
+chromadb
+
+# Optional: UI (Module 17)
+streamlit
