@@ -17,7 +17,7 @@ if not api_key:
     print("Error: LLM_FARM_API_KEY is not set in the environment.")
     sys.exit(1)
 
-def orchestrate_content_creation(user_prompt: str, feedback: str = None):
+def orchestrate_content_creation(user_prompt: str, feedback: str = None, app_status=None):
     # Initialize the variables for the iterative process
     max_iterations = 3
     current_iteration = 1
@@ -33,6 +33,12 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None):
         print("Content generation in-progress...")
         print(f"Iteration {current_iteration} completed.")
 
+        message = f"Iteration {current_iteration}. Writer is drafting the content..."
+        if app_status:
+            app_status.info(message)
+        else:
+            print(message)
+
         if "Error contacting Bosch LLM Farm" in generated_content:
             print(generated_content)
             return
@@ -40,6 +46,8 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None):
         print(f"Generated Content after Iteration {current_iteration}:")
         current_draft=generated_content
         print(generated_content)
+        if app_status:
+            app_status.info(f"Generated Content after Iteration {current_iteration}:\n{generated_content}")
  
         # Step 2: Review the generated content
         print("Reviewing the generated content...")
@@ -57,6 +65,8 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None):
         # Step 3: If the score is less than 4, use the feedback to improve the content in the next iteration
         if review_score >= 4:
             print("Content quality is satisfactory. Ending the process.")
+            app_status.success(f"Number of Iterations taken to arrive at conclusion :{current_iteration}") if app_status else print(f"Number of Iterations taken to arrive at conclusion :{current_iteration}")
+            app_status.success("Final Content:\n" + generated_content) if app_status else print("Final Content:\n" + generated_content)
             break
         else:
             print("Content quality is unsatisfactory. Continuing to the next iteration.")
@@ -70,7 +80,11 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None):
 
         current_iteration += 1
 
-    print(f"Number of Iterations taken to arrive at conclusion :{current_iteration-1}")
+    message = f"Number of Iterations taken to arrive at conclusion :{current_iteration}"
+    if app_status:
+        app_status.info(message)
+    else:
+        print(message)
 
 if __name__ == "__main__":
     # Get input from the user for the topic they want to create content about
