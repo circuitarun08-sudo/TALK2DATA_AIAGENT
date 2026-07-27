@@ -45,28 +45,30 @@ def orchestrate_content_creation(user_prompt: str, feedback: str = None, app_sta
 
         print(f"Generated Content after Iteration {current_iteration}:")
         current_draft=generated_content
-        print(generated_content)
-        if app_status:
-            app_status.info(f"Generated Content after Iteration {current_iteration}:\n{generated_content}")
+        app_status.info(f"Generated Content after Iteration {current_iteration}:\n{generated_content}") if app_status else print(f"Generated Content after Iteration {current_iteration}:\n{generated_content}")
  
         # Step 2: Review the generated content
-        print("Reviewing the generated content...")
+        app_status.info("Reviewing the generated content...") if app_status else print("Reviewing the generated content...")
         #raw_json_response_content, review_score, review_feedback = review_content(generated_content, user_prompt, api_key)
         review_score, review_feedback = review_content(generated_content, user_prompt, api_key)
 
         if review_score is None:
-            print(review_feedback)  # This will contain the error message
+            if app_status:
+                app_status.info(review_feedback)
+            else:
+                print(review_feedback)  # This will contain the error message
             return
-
-        print(f"Review Results after Iteration {current_iteration}:")
-        print(f"Score: {review_score}")
-        print(f"Feedback: {review_feedback}")
+        
+        if app_status:
+            app_status.info(f"Review Results after Iteration {current_iteration}:\n Score: {review_score}\n Feedback: {review_feedback}")
+        else:
+            print(f"Review Results after Iteration {current_iteration}:\n Score: {review_score}\n Feedback: {review_feedback}")
 
         # Step 3: If the score is less than 4, use the feedback to improve the content in the next iteration
         if review_score >= 4:
             print("Content quality is satisfactory. Ending the process.")
-            app_status.success(f"Number of Iterations taken to arrive at conclusion :{current_iteration}") if app_status else print(f"Number of Iterations taken to arrive at conclusion :{current_iteration}")
-            app_status.success("Final Content:\n" + generated_content) if app_status else print("Final Content:\n" + generated_content)
+            #app_status.success(f"") if app_status else print(f"Number of Iterations taken to arrive at conclusion :{current_iteration}")
+            app_status.success(f"Number of Iterations taken to arrive at conclusion :{current_iteration} \n Final Content:\n{generated_content}") if app_status else print(f"Final Content:\n{generated_content}")
             break
         else:
             print("Content quality is unsatisfactory. Continuing to the next iteration.")
