@@ -14,7 +14,23 @@ if not api_key:
 def query_llm_farm(prompt: str):
     # Base configuration for Bosch LLM Farm API
     #url = "https://aoai-farm.bosch-temp.com" # Replace with the exact endpoint provided in your LLM Farm registration
-    url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
+    
+    # Below are some example endpoints for different models available on the Bosch LLM Farm for Developer subscription. Uncomment the one you want to use.
+
+    #OpenAI - Works
+    url="https://aoai-farm.bosch-temp.com/api/openai/deployments/askbosch-prod-farm-openai-gpt-4o-mini-2024-07-18/chat/completions?api-version=2025-04-01-preview"
+    # url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
+
+    #Meta - Does not work
+    # url="https://aoai-farm.bosch-temp.com/api/openai/deployments/deepseek-v4-flash-2026-04-23/chat/completions?api-version=2025-04-01-preview"
+
+    #Gemini 
+    # url="https://aoai-farm.bosch-temp.com/api/google/v1/endpoints/deepseek-r1-0528-maas/openapi/chat/completions"
+    # url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gemini-2.5-flash-lite/chat/completions"
+    
+    #Deepseek - Does not work
+    # url="https://aoai-farm.bosch-temp.com/api/openai/deployments/deepseek-r1-0528-maas/chat/completions"
+
 
     #commented out the below headers as they are to be defined differently for Azure OpenAI Service. The headers below are for standard OpenAI API usage. For Azure OpenAI, Azure OpenAI endpoints usually expect the API key in a custom header called api-key instead of the standard standard Authorization: Bearer <key> header..
     # headers = {
@@ -56,8 +72,9 @@ def query_llm_farm(prompt: str):
         return f"Error contacting Bosch LLM Farm: {e}"
 
 if __name__ == "__main__":
-    user_prompt = "Hello! Explain the core benefit of using AI agents for automation."
+    # user_prompt = "Hello! Explain the core benefit of using AI agents for automation."
+    user_prompt = input("[User] : ") 
     print("Sending prompt to Bosch LLM Farm...")
     response_text = query_llm_farm(user_prompt)
     print("\nResponse from LLM Farm:")
-    print(response_text)
+    print(f"[AI] : {response_text}")
