@@ -18,15 +18,14 @@ def query_llm_farm(prompt: str):
     # Below are some example endpoints for different models available on the Bosch LLM Farm for Developer subscription. Uncomment the one you want to use.
 
     #OpenAI - Works
-    url="https://aoai-farm.bosch-temp.com/api/openai/deployments/askbosch-prod-farm-openai-gpt-4o-mini-2024-07-18/chat/completions?api-version=2025-04-01-preview"
+    # url="https://aoai-farm.bosch-temp.com/api/openai/deployments/askbosch-prod-farm-openai-gpt-4o-mini-2024-07-18/chat/completions?api-version=2025-04-01-preview"
     # url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gpt-5-nano-2025-08-07/chat/completions?api-version=2025-04-01-preview"
 
     #Meta - Does not work
     # url="https://aoai-farm.bosch-temp.com/api/openai/deployments/deepseek-v4-flash-2026-04-23/chat/completions?api-version=2025-04-01-preview"
 
-    #Gemini 
-    # url="https://aoai-farm.bosch-temp.com/api/google/v1/endpoints/deepseek-r1-0528-maas/openapi/chat/completions"
-    # url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gemini-2.5-flash-lite/chat/completions"
+    #Gemini - Works
+    url="https://aoai-farm.bosch-temp.com/api/openai/deployments/gemini-2.5-flash-lite/chat/completions"
     
     #Deepseek - Does not work
     # url="https://aoai-farm.bosch-temp.com/api/openai/deployments/deepseek-r1-0528-maas/chat/completions"
